@@ -1,0 +1,58 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Confirmare Plată -
+Jucători ATP{% endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-body text-center py-5">
+          <div class="mb-4">
+            <i
+              class="bi bi-check-circle-fill text-success"
+              style="font-size: 5rem"
+            ></i>
+          </div>
+          <h2 class="mb-3">Plată procesată cu succes!</h2>
+          <p class="lead">
+            Mulțumim pentru abonarea la planul {{ tip_abonament|title }}.
+          </p>
+
+          <div class="mb-4">
+            <p>
+              Ați primit un email de confirmare la adresa:
+              <strong>{{ email }}</strong>
+            </p>
+            <p>
+              Numărul comenzii dumneavoastră este:
+              <strong>{{ id_comanda }}</strong>
+            </p>
+          </div>
+
+          <div class="mb-4 py-3 border-top border-bottom">
+            <h5>Detalii abonament:</h5>
+            <p class="mb-1">Plan: <strong>{{ tip_abonament|title }}</strong></p>
+            <p class="mb-1">
+              Preț:
+              <strong
+                >{% if tip_abonament == 'basic' %}5€{% else %}10€{% endif
+                %}/lună</strong
+              >
+            </p>
+            <p class="mb-1">
+              Următoarea facturare:
+              <strong>{{ data_urmatoare_facturare }}</strong>
+            </p>
+          </div>
+
+          <p>Puteți începe să vizionați meciurile imediat!</p>
+
+          <div class="mt-4">
+            <a href="{% url 'lista_jucatori' %}" class="btn btn-primary"
+              >Înapoi la pagina principală</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

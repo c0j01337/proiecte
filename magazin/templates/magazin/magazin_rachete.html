@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Magazin Rachete - Jucători ATP{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center mb-4 page-title">Magazin Rachete de Tenis</h1>
+    
+    <!-- Secțiunea de filtrare -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="filter-section p-3 rounded">
+                <h5 class="filter-title mb-3">Filtrează produsele</h5>
+                
+                <form action="{% url 'magazin_rachete' %}" method="GET">
+                    {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Producător</label>
+                        <select name="producator" class="form-select">
+                            <option value="">Toți producătorii</option>
+                            {% for p in producatori %}
+                            <option value="{{ p.id }}" {% if selected_producator == p.id|stringformat:"i" %}selected{% endif %}>
+                                {{ p.nume }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Categorie</label>
+                        <select name="categorie" class="form-select">
+                            <option value="">Toate categoriile</option>
+                            {% for c in categorii %}
+                            <option value="{{ c.id }}" {% if selected_categorie == c.id|stringformat:"i" %}selected{% endif %}>
+                                {{ c.nume }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Sortează după</label>
+                        <select name="sortare" class="form-select">
+                            <option value="nume" {% if selected_sortare == 'nume' %}selected{% endif %}>Nume (A-Z)</option>
+                            <option value="pret_crescator" {% if selected_sortare == 'pret_crescator' %}selected{% endif %}>Preț crescător</option>
+                            <option value="pret_descrescator" {% if selected_sortare == 'pret_descrescator' %}selected{% endif %}>Preț descrescător</option>
+                            <option value="noutati" {% if selected_sortare == 'noutati' %}selected{% endif %}>Cele mai noi</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary w-100">Aplică filtre</button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="col-md-9">
+            {% if query %}
+            <div class="search-results text-center mb-4">
+                <h5>Rezultate pentru căutarea: "{{ query }}"</h5>
+                <p>{{ rachete.count }} produs(e) găsite</p>
+            </div>
+            {% endif %}
+            
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% for racheta in rachete %}
+                <div class="col">
+                    <div class="card h-100 player-card">
+                        <a href="{% url 'detalii_racheta' racheta.slug %}" class="text-decoration-none">
+                            <div class="position-relative">
+                                {% if racheta.imagine_principala %}
+                                <img src="{{ racheta.imagine_principala.url }}" class="card-img-top player-img" alt="{{ racheta.nume }}">
+                                {% else %}
+                                <img src="{% static 'img/placeholder.jpg' %}" class="card-img-top player-img" alt="Imagine indisponibilă">
+                                {% endif %}
+                                
+                                {% if racheta.are_reducere %}
+                                <div class="position-absolute top-0 start-0 bg-danger text-white p-2">
+                                    -{{ racheta.procent_reducere }}%
+                                </div>
+                                {% endif %}
+                                
+                                {% if not racheta.in_stoc %}
+                                <div class="position-absolute top-50 start-50 translate-middle bg-dark bg-opacity-75 text-white p-2 px-3 rounded">
+                                    Stoc epuizat
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-dark">{{ racheta.nume }}</h5>
+                                <p class="card-text text-muted">{{ racheta.producator.nume }}</p>
+                                
+                                <div class="mt-2">
+                                    {% if racheta.are_reducere %}
+                                    <span class="text-decoration-line-through text-muted me-2">{{ racheta.pret }} RON</span>
+                                    <span class="text-danger fw-bold">{{ racheta.pret_redus }} RON</span>
+                                    {% else %}
+                                    <span class="fw-bold">{{ racheta.pret }} RON</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center">
+                    <p>Nu s-au găsit rachete care să corespundă căutării.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

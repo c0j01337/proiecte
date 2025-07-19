@@ -1,0 +1,268 @@
+{% extends 'base.html' %} {% load static %} {% block title %}Formular Abonament
+{{ tip|title }} - Jucători ATP{% endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item">
+            <a href="{% url 'lista_jucatori' %}">Acasă</a>
+          </li>
+          <li class="breadcrumb-item">
+            <a href="{% url 'abonamente' %}">Abonamente</a>
+          </li>
+          <li class="breadcrumb-item active">Abonament {{ tip|title }}</li>
+        </ol>
+      </nav>
+
+      <div class="card shadow-sm">
+        <div
+          class="card-header {% if tip == 'basic' %}bg-primary text-white{% else %}bg-warning{% endif %}"
+        >
+          <h2 class="mb-0">Abonament {{ tip|title }}</h2>
+        </div>
+        <div class="card-body">
+          <div class="mb-4">
+            <h4>Sumar comandă:</h4>
+            <div class="d-flex justify-content-between border-bottom py-2">
+              <span>Abonament {{ tip|title }}</span>
+              <span class="fw-bold"
+                >{% if tip == 'basic' %}5€{% else %}10€{% endif %}/lună</span
+              >
+            </div>
+            <div class="d-flex justify-content-between pt-2">
+              <span class="fw-bold">Total:</span>
+              <span class="fw-bold"
+                >{% if tip == 'basic' %}5€{% else %}10€{% endif %}</span
+              >
+            </div>
+          </div>
+
+          <form
+            id="payment-form"
+            method="post"
+            action="{% url 'procesare_plata' %}"
+          >
+            {% csrf_token %}
+            <input type="hidden" name="tip_abonament" value="{{ tip }}" />
+
+            <h4 class="mb-3">Informații personale</h4>
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label for="nume" class="form-label">Nume</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nume"
+                  name="nume"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="prenume" class="form-label">Prenume</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="prenume"
+                  name="prenume"
+                  required
+                />
+              </div>
+              <div class="col-12">
+                <label for="email" class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  required
+                />
+              </div>
+              <div class="col-12">
+                <label for="telefon" class="form-label">Telefon</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="telefon"
+                  name="telefon"
+                  required
+                />
+              </div>
+            </div>
+
+            <h4 class="mb-3">Detalii card</h4>
+            <div class="row g-3 mb-4">
+              <div class="col-12">
+                <label for="card_numar" class="form-label">Număr card</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="card_numar"
+                  name="card_numar"
+                  placeholder="XXXX XXXX XXXX XXXX"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="card_expirare" class="form-label"
+                  >Data expirării</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="card_expirare"
+                  name="card_expirare"
+                  placeholder="MM/YY"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="card_cvv" class="form-label">CVV</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="card_cvv"
+                  name="card_cvv"
+                  placeholder="XXX"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="form-check mb-4">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="termeni"
+                name="termeni"
+                required
+              />
+              <label class="form-check-label" for="termeni">
+                Sunt de acord cu
+                <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal"
+                  >termenii și condițiile</a
+                >
+              </label>
+            </div>
+
+            <button
+              type="submit"
+              class="btn {% if tip == 'basic' %}btn-primary{% else %}btn-warning{% endif %} btn-lg w-100"
+            >
+              Plătește {% if tip == 'basic' %}5€{% else %}10€{% endif %}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal pentru termeni și condiții -->
+<div
+  class="modal fade"
+  id="termsModal"
+  tabindex="-1"
+  aria-labelledby="termsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="termsModalLabel">Termeni și condiții</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <h6>1. Abonament și facturare</h6>
+        <p>
+          Abonamentul la serviciul nostru se face pe bază lunară și se
+          reînnoiește automat la fiecare 30 de zile, cu excepția cazului în care
+          alegeți să anulați.
+        </p>
+
+        <h6>2. Anulare</h6>
+        <p>
+          Puteți anula abonamentul în orice moment din contul dvs. Anularea va
+          intra în vigoare la sfârșitul perioadei de facturare curente.
+        </p>
+
+        <h6>3. Calitatea serviciului</h6>
+        <p>
+          Calitatea video depinde de dispozitivul dvs. și de conexiunea la
+          internet. Rezoluția 4K este disponibilă doar pentru abonamentele
+          Premium.
+        </p>
+
+        <h6>4. Protecția datelor</h6>
+        <p>
+          Datele cardului dvs. sunt procesate în siguranță și nu sunt stocate pe
+          serverele noastre.
+        </p>
+
+        <h6>5. Limitări geografice</h6>
+        <p>
+          Unele meciuri pot fi restricționate în anumite regiuni din cauza
+          drepturilor de difuzare.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Închide
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  // Validare simplă pentru câmpurile de card
+  document.addEventListener("DOMContentLoaded", function () {
+    const cardNumber = document.getElementById("card_numar");
+    const cardExpiry = document.getElementById("card_expirare");
+    const cardCvv = document.getElementById("card_cvv");
+
+    if (cardNumber) {
+      cardNumber.addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length > 16) value = value.slice(0, 16);
+
+        // Format with spaces
+        let formattedValue = "";
+        for (let i = 0; i < value.length; i++) {
+          if (i > 0 && i % 4 === 0) formattedValue += " ";
+          formattedValue += value[i];
+        }
+
+        e.target.value = formattedValue;
+      });
+    }
+
+    if (cardExpiry) {
+      cardExpiry.addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length > 4) value = value.slice(0, 4);
+
+        // Format as MM/YY
+        if (value.length > 2) {
+          value = value.slice(0, 2) + "/" + value.slice(2);
+        }
+
+        e.target.value = value;
+      });
+    }
+
+    if (cardCvv) {
+      cardCvv.addEventListener("input", function (e) {
+        let value = e.target.value.replace(/\D/g, "");
+        if (value.length > 3) value = value.slice(0, 3);
+        e.target.value = value;
+      });
+    }
+  });
+</script>
+{% endblock %}

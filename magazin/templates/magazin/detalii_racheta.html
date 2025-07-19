@@ -1,0 +1,283 @@
+{% extends 'base.html' %} {% load static %} {% block title %}{{ racheta.nume }}
+- Jucători ATP{% endblock %} {% block extra_css %}
+<style>
+  .product-img {
+    max-height: 400px;
+    object-fit: contain;
+  }
+  .quantity-input {
+    width: 70px;
+    text-align: center;
+  }
+  .specs-table td {
+    padding: 8px 0;
+  }
+  .specs-table td:first-child {
+    font-weight: 600;
+    width: 40%;
+  }
+  .carousel-item {
+    height: 400px;
+    background-color: #f8f9fa;
+  }
+  .carousel-img {
+    height: 100%;
+    object-fit: contain;
+  }
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 10%;
+  }
+  .carousel-indicators {
+    bottom: -40px;
+  }
+  .carousel-indicators [data-bs-target] {
+    background-color: #1e5799;
+  }
+  .badge-stock {
+    font-size: 0.9rem;
+    padding: 0.5rem;
+  }
+  .btn-add-to-cart {
+    background: linear-gradient(
+      90deg,
+      #1e5799 0%,
+      #2989d8 50%,
+      #207cca 51%,
+      #7db9e8 100%
+    );
+    border: none;
+    font-weight: 600;
+  }
+  .btn-add-to-cart:hover {
+    background: linear-gradient(
+      90deg,
+      #1e5799 0%,
+      #207cca 50%,
+      #2989d8 51%,
+      #7db9e8 100%
+    );
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item">
+        <a href="{% url 'lista_jucatori' %}">Acasă</a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="{% url 'magazin_rachete' %}">Magazin</a>
+      </li>
+      <li class="breadcrumb-item active" aria-current="page">
+        {{ racheta.nume }}
+      </li>
+    </ol>
+  </nav>
+
+  <div class="row">
+    <!-- Carusel imagini produs -->
+    <div class="col-md-6 mb-4">
+      <div id="carouselRacheta" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button
+            type="button"
+            data-bs-target="#carouselRacheta"
+            data-bs-slide-to="0"
+            class="active"
+            aria-current="true"
+          ></button>
+          {% if racheta.imagine_secundara %}
+          <button
+            type="button"
+            data-bs-target="#carouselRacheta"
+            data-bs-slide-to="1"
+          ></button>
+          {% endif %} {% if racheta.imagine_tertiara %}
+          <button
+            type="button"
+            data-bs-target="#carouselRacheta"
+            data-bs-slide-to="2"
+          ></button>
+          {% endif %}
+        </div>
+
+        <div class="carousel-inner rounded shadow">
+          <div class="carousel-item active">
+            <img
+              src="{{ racheta.imagine_principala.url }}"
+              class="d-block w-100 carousel-img"
+              alt="{{ racheta.nume }}"
+            />
+          </div>
+
+          {% if racheta.imagine_secundara %}
+          <div class="carousel-item">
+            <img
+              src="{{ racheta.imagine_secundara.url }}"
+              class="d-block w-100 carousel-img"
+              alt="{{ racheta.nume }}"
+            />
+          </div>
+          {% endif %} {% if racheta.imagine_tertiara %}
+          <div class="carousel-item">
+            <img
+              src="{{ racheta.imagine_tertiara.url }}"
+              class="d-block w-100 carousel-img"
+              alt="{{ racheta.nume }}"
+            />
+          </div>
+          {% endif %}
+        </div>
+
+        <button
+          class="carousel-control-prev"
+          type="button"
+          data-bs-target="#carouselRacheta"
+          data-bs-slide="prev"
+        >
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Înapoi</span>
+        </button>
+        <button
+          class="carousel-control-next"
+          type="button"
+          data-bs-target="#carouselRacheta"
+          data-bs-slide="next"
+        >
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Înainte</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Detalii produs -->
+    <div class="col-md-6">
+      <h2 class="mb-2">{{ racheta.nume }}</h2>
+      <h6 class="text-muted mb-3">{{ racheta.producator.nume }}</h6>
+
+      <p class="mb-3">{{ racheta.descriere_scurta }}</p>
+
+      <div class="d-flex align-items-center mb-3">
+        {% if racheta.are_reducere %}
+        <span class="text-decoration-line-through text-muted me-2 fs-5"
+          >{{ racheta.pret }} RON</span
+        >
+        <span class="text-danger fw-bold fs-3"
+          >{{ racheta.pret_redus }} RON</span
+        >
+        <span class="badge bg-danger ms-3"
+          >-{{ racheta.procent_reducere }}%</span
+        >
+        {% else %}
+        <span class="fw-bold fs-3">{{ racheta.pret }} RON</span>
+        {% endif %}
+      </div>
+
+      {% if racheta.in_stoc and racheta.stoc > 0 %}
+      <p class="mb-4">
+        <span class="badge bg-success badge-stock"
+          >În stoc ({{ racheta.stoc }} disponibile)</span
+        >
+      </p>
+      {% else %}
+      <p class="mb-4">
+        <span class="badge bg-secondary badge-stock">Stoc epuizat</span>
+      </p>
+      {% endif %}
+
+      <form
+        id="formAdaugaCos"
+        action="{% url 'adauga_in_cos' %}"
+        method="post"
+        class="mb-4"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="racheta_id" value="{{ racheta.id }}" />
+
+        <div class="d-flex align-items-center mb-3">
+          <label for="cantitate" class="form-label me-3 mb-0">Cantitate:</label>
+          <div class="input-group" style="width: 130px">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              id="decreaseQuantity"
+            >
+              -
+            </button>
+            <input
+              type="number"
+              class="form-control text-center"
+              id="cantitate"
+              name="cantitate"
+              value="1"
+              min="1"
+              max="{{ racheta.stoc }}"
+            />
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              id="increaseQuantity"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-add-to-cart btn-lg"
+          {%
+          if
+          not
+          racheta.in_stoc
+          or
+          racheta.stoc
+          <="0"
+          %}disabled{%
+          endif
+          %}
+        >
+          <i class="bi bi-cart-plus"></i> Adaugă în coș
+        </button>
+      </form>
+
+      <div id="alertContainer"></div>
+
+      <div class="border-top pt-3 mt-3">
+        <h5>Specificații tehnice:</h5>
+        <table class="table table-borderless specs-table">
+          <tbody>
+            {% if racheta.greutate %}
+            <tr>
+              <td>Greutate:</td>
+              <td>{{ racheta.greutate }}</td>
+            </tr>
+            {% endif %} {% if racheta.marime_cap %}
+            <tr>
+              <td>Mărime cap:</td>
+              <td>{{ racheta.marime_cap }}</td>
+            </tr>
+            {% endif %} {% if racheta.lungime %}
+            <tr>
+              <td>Lungime:</td>
+              <td>{{ racheta.lungime }}</td>
+            </tr>
+            {% endif %} {% if racheta.balans %}
+            <tr>
+              <td>Balans:</td>
+              <td>{{ racheta.balans }}</td>
+            </tr>
+            {% endif %} {% if racheta.tip_corzi %}
+            <tr>
+              <td>Tip corzi:</td>
+              <td>{{ racheta.tip_corzi }}</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
